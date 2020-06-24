@@ -1,0 +1,21 @@
+{
+  "twitter" : {
+    "consumer_key": "",
+    "consumer_secret": "",
+    "access_token": "",
+    "access_token_secret": ""
+  },
+  "db_file": "./twitter_export.db",
+  "message": "DM message.",
+  "retry_message": "Retry DM message.",
+  "retry_after_days": 7,
+  "follower_filters": {
+    "created_before": "",
+    "min_followers_count": 100,
+    "min_friends_count": 50,
+    "verified_only": false
+  },
+  "test_flag": true,
+  "test_accounts": [],
+  "test_retry_message": false
+}

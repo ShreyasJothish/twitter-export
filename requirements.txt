@@ -1,0 +1,5 @@
+dash==1.13.3
+numpy==1.19.0
+pandas==1.0.5
+timeloop==1.0.2
+tweepy==3.8.0

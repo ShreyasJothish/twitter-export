@@ -7,34 +7,9 @@ import tweepy
 from db import init_db, insert_follower, query_follower_by_id, insert_dm_status, query_dm_status_by_id, \
     insert_skip_user, query_skip_user_by_id
 
-
-with open('config.json') as config_file:
-    config_data = json.load(config_file)
-
-print("Loading twitter configurations.")
-consumer_key = config_data['twitter']['consumer_key']
-consumer_secret = config_data['twitter']['consumer_secret']
-access_token = config_data['twitter']['access_token']
-access_token_secret = config_data['twitter']['access_token_secret']
-
-print("Loading db file path")
-db_file = config_data['db_file']
-
-print("Loading DM messages.")
-message = config_data['message']
-retry_message = config_data['retry_message']
-retry_after_days = config_data['retry_after_days']
-
-print("Loading filters for followers.")
-filter_created_before = config_data['follower_filters']['created_before']
-filter_min_followers_count = config_data['follower_filters']['min_followers_count']
-filter_min_friends_count = config_data['follower_filters']['min_friends_count']
-filter_verified_only = config_data['follower_filters']['verified_only']
-
-print("Loading test configurations.")
-test_flag = config_data['test_flag']
-test_accounts = config_data['test_accounts']
-test_retry_message =  config_data['test_retry_message']
+from config import consumer_key, consumer_secret, access_token, access_token_secret, message, retry_message,\
+    retry_after_days, filter_created_before, filter_min_followers_count, filter_min_friends_count, \
+    filter_verified_only, test_flag, test_accounts, test_retry_message
 
 
 def datetime_valid(dt_str):
@@ -43,6 +18,20 @@ def datetime_valid(dt_str):
     except Exception as e:
         return False
     return True
+
+
+def get_total_follower_count():
+    """
+    Fetch total follower count
+    :return: Total follower count
+    """
+    auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
+    auth.set_access_token(access_token, access_token_secret)
+
+    api = tweepy.API(auth)
+
+    me = api.me()
+    return me._json['followers_count']
 
 
 def build_filter_query():
@@ -238,7 +227,7 @@ def trigger_follower_processing():
     dm_limit = 1000
 
     # initialize db
-    conn = init_db(db_file)
+    conn = init_db()
 
     auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
     auth.set_access_token(access_token, access_token_secret)
@@ -305,7 +294,6 @@ def trigger_follower_processing():
     if follower_id_list:
         print("Fetching follower details from twitter.")
         lookup_users_count = 100
-        print(total_followers_count, lookup_users_count)
 
         iterations = total_followers_count // lookup_users_count
         if total_followers_count % lookup_users_count:
@@ -363,4 +351,4 @@ def trigger_follower_processing():
         shortlisted_followers = cur.fetchall()
 
         # sending DM to shortlisted followers
-        send_dm(api, conn, shortlisted_followers)
+        # send_dm(api, conn, shortlisted_followers)  # to be uncommented

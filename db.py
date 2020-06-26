@@ -1,5 +1,9 @@
+import json
+import pandas as pd
 import sqlite3
 from sqlite3 import Error
+
+from config import db_file
 
 
 def create_connection(db_file):
@@ -34,7 +38,7 @@ def create_table(conn, create_table_sql):
     return True
 
 
-def init_db(db_file):
+def init_db():
     """ initialise sqllite db
     :param db_file: database file
     :return: Connection object or None
@@ -201,3 +205,15 @@ def query_skip_user_by_id(conn, id):
 
     return row
 
+
+def get_all_records(table_name):
+    """
+    Get all the follower information
+    :param db_file: database file
+    :param table_name: table name
+    :return: Data Frame of follower details
+    """
+    conn = sqlite3.connect(db_file)
+    df = pd.read_sql_query(f"SELECT * FROM {table_name}", conn)
+
+    return df

@@ -6,19 +6,19 @@
     "access_token_secret": ""
   },
   "db_file": "./twitter_export.db",
+  "test_flag": true,
+  "test_accounts": [],
+  "test_retry_message": false,
   "enable_dm_flag": false,
   "message": "",
   "retry_message": "",
   "retry_after_days": 7,
   "follower_filters": {
-    "created_before": "",
+    "created_before": "2019-06-27 00:00:00",
     "min_followers_count": 100,
     "max_followers_count": 10000,
     "min_friends_count": 50,
     "max_friends_count": 10000,
     "verified_only": false
-  },
-  "test_flag": true,
-  "test_accounts": [],
-  "test_retry_message": false
+  }
 }

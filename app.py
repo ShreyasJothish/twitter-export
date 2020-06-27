@@ -31,7 +31,7 @@ export_options = ["Export high value followers",
 
 app.layout = html.Div(
     html.Div([
-        html.H4('Twitter Export Dash Board'),
+        html.H4('Twitter Exporter Dash Board'),
         html.Div(id='live-update-text'),
         dcc.Dropdown(
             id='export-options',

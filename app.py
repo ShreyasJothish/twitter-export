@@ -1,3 +1,4 @@
+import base64
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
@@ -29,48 +30,58 @@ export_options = ["Export high value followers",
                   "Export all DM status",
                   "Export all skipped followers"]
 
-app.layout = html.Div(
+app.layout = html.Div([
+    dcc.Graph(id='live-update-graph',
+              style={'height': '100vh', 'width': '74%', 'float': 'center', 'display': 'inline-block'}),
     html.Div([
-        html.H4('Twitter Exporter Dash Board'),
-        html.Div(id='live-update-text'),
-        dcc.Dropdown(
-            id='export-options',
-            options=[{'label': i, 'value': i} for i in export_options],
-            # value=export_options[0]
-        ),
-        html.Div(id='export-options-output'),
-        dcc.Graph(id='live-update-graph'),
-        dcc.Interval(
+        html.Br(),
+        html.Br(),
+        html.H4('Twitter Exporter Statistics',
+                style={'text-align': 'center', 'font-size': '2em'}),
+        html.Table([
+            html.Tr([html.Td('Overall Followers: '), html.Td(id='overall_followers')]),
+            html.Tr([html.Td('Fetched Followers: '), html.Td(id='fetched_followers')]),
+            html.Tr([html.Td('Skipped Followers: '), html.Td(id='skipped_followers')]),
+            html.Tr([html.Td('DM Sent: '), html.Td(id='dm_sent')]),
+            html.Tr([html.Td('Retry DM Sent: '), html.Td(id='retry_dm_sent')]),
+        ], style={'text-align': 'left', 'font-size': '1.5em'}),
+        html.Br(),
+        html.Br(),
+        html.H4('Export Data',
+                style={'text-align': 'center', 'font-size': '2em'}),
+        dcc.Dropdown(id='export-options', options=[{'label': i, 'value': i} for i in export_options],
+                     style={'text-align': 'left', 'font-size': '1.em'})],
+        style={'height': '100vh', 'width': '25%', 'float': 'right', 'display': 'inline-block'}),
+    dcc.Interval(
             id='interval-component',
             interval=60*1000,  # in milliseconds # to be updated to 30 mins
             n_intervals=0
         )
-    ]
-    ),
-)
+    ], style={'height': '98vh', 'width': '98vw',
+              'font': 'courier', 'background-color': 'rgb(0,172,238)'})
 
 
-@app.callback(Output('live-update-text', 'children'),
+@app.callback([Output('overall_followers', 'children'),
+               Output('fetched_followers', 'children'),
+               Output('skipped_followers', 'children'),
+               Output('dm_sent', 'children'),
+               Output('retry_dm_sent', 'children')],
               [Input('interval-component', 'n_intervals')])
 def update_metrics(n):
     follower_df = get_all_records("follower")
     dm_status_df = get_all_records("dm_status")
     skip_user_df = get_all_records("skip_user")
 
-    total_follower_count = get_total_follower_count()
+    # total_follower_count = get_total_follower_count()  # to be uncommented
+    total_follower_count = 190
+
+
     fetch_follower_count = follower_df.shape[0]
     dm_count = dm_status_df.shape[0]
     unique_dm_count = dm_status_df.drop_duplicates('id').shape[0]
     skip_user_count = skip_user_df.shape[0]
 
-    style = {'padding': '5px', 'fontSize': '16px'}
-    return [
-        html.Span(f'Overall Followers: {total_follower_count}', style=style),
-        html.Span(f'Fetched Followers: {fetch_follower_count}', style=style),
-        html.Span(f'Skipped Followers: {skip_user_count}', style=style),
-        html.Span(f'DM Sent: {unique_dm_count}', style=style),
-        html.Span(f'Retry DM Sent: {dm_count - unique_dm_count}', style=style),
-    ]
+    return total_follower_count, fetch_follower_count, skip_user_count, unique_dm_count, dm_count-unique_dm_count
 
 
 @app.callback(Output('live-update-graph', 'figure'),
@@ -159,28 +170,28 @@ def export_data(export_option):
         high_value_followers = get_high_value_followers()
         high_value_followers.to_csv(f"high_value_followers_{current_time}.csv", index=False)
 
-        return f"High value followers data exported as high_value_followers_{current_time}.csv"
+        return f"Data exported: high_value_followers_{current_time}.csv"
 
     # Export all fetched followers
     elif export_option == export_options[1]:
         follower_df = get_all_records("follower")
         follower_df.to_csv(f"followers_{current_time}.csv", index=False)
 
-        return f"Followers data exported as followers_{current_time}.csv"
+        return f"Data exported: followers_{current_time}.csv"
 
     # Export all DM status
     elif export_option == export_options[2]:
         dm_status_df = get_all_records("dm_status")
         dm_status_df.to_csv(f"dm_status_{current_time}.csv", index=False)
 
-        return f"DM status data exported as dm_status_{current_time}.csv"
+        return f"Data exported: dm_status_{current_time}.csv"
 
     #  Export all skipped followers
     elif export_option == export_options[3]:
         skip_user_df = get_all_records("skip_user")
         skip_user_df.to_csv(f"skip_followers_{current_time}.csv", index=False)
 
-        return f"Skipped followers data exported as skip_followers_{current_time}.csv"
+        return f"Data exported: skip_followers_{current_time}.csv"
 
 
 if __name__ == '__main__':

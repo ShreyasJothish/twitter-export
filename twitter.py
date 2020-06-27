@@ -7,9 +7,11 @@ import tweepy
 from db import init_db, insert_follower, query_follower_by_id, insert_dm_status, query_dm_status_by_id, \
     insert_skip_user, query_skip_user_by_id
 
-from config import consumer_key, consumer_secret, access_token, access_token_secret, message, retry_message,\
-    retry_after_days, filter_created_before, filter_min_followers_count, filter_min_friends_count, \
-    filter_verified_only, test_flag, test_accounts, test_retry_message
+from config import consumer_key, consumer_secret, access_token, access_token_secret, \
+    enable_dm_flag, message, retry_message, retry_after_days, \
+    filter_created_before, filter_min_followers_count, filter_max_followers_count,\
+    filter_min_friends_count, filter_max_friends_count, filter_verified_only, \
+    test_flag, test_accounts, test_retry_message
 
 
 def datetime_valid(dt_str):
@@ -59,6 +61,15 @@ def build_filter_query():
 
         sql_values.append(filter_min_followers_count)
 
+    if filter_max_followers_count:
+
+        if not sql_values:
+            sql_str = sql_str + " WHERE followers_count < ?"
+        else:
+            sql_str = sql_str + " AND followers_count < ?"
+
+        sql_values.append(filter_max_followers_count)
+
     if filter_min_friends_count:
 
         if not sql_values:
@@ -67,6 +78,15 @@ def build_filter_query():
             sql_str = sql_str + " AND friends_count >= ?"
 
         sql_values.append(filter_min_friends_count)
+
+    if filter_max_friends_count:
+
+        if not sql_values:
+            sql_str = sql_str + " WHERE friends_count < ?"
+        else:
+            sql_str = sql_str + " AND friends_count < ?"
+
+        sql_values.append(filter_max_friends_count)
 
     if not sql_values:
         sql_str = sql_str + " WHERE verified = ?"
@@ -220,7 +240,9 @@ def trigger_follower_processing():
     """
     print(f"Triggering follower processing")
 
-    # test accound limit
+    return  # to be deleted
+
+    # test account limit
     max_test_account = 5
 
     # DM limit currently set by twitter
@@ -351,4 +373,8 @@ def trigger_follower_processing():
         shortlisted_followers = cur.fetchall()
 
         # sending DM to shortlisted followers
-        # send_dm(api, conn, shortlisted_followers)  # to be uncommented
+        if enable_dm_flag:
+            print("Sending DMs to shortlisted followers.")
+            # send_dm(api, conn, shortlisted_followers)  # to be uncommented
+        else:
+            print("Sending DMs flag is off.")

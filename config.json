@@ -6,13 +6,16 @@
     "access_token_secret": ""
   },
   "db_file": "./twitter_export.db",
-  "message": "DM message.",
-  "retry_message": "Retry DM message.",
+  "enable_dm_flag": false,
+  "message": "",
+  "retry_message": "",
   "retry_after_days": 7,
   "follower_filters": {
     "created_before": "",
     "min_followers_count": 100,
+    "max_followers_count": 10000,
     "min_friends_count": 50,
+    "max_friends_count": 10000,
     "verified_only": false
   },
   "test_flag": true,

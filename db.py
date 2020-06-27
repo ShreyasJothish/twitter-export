@@ -3,7 +3,7 @@ import pandas as pd
 import sqlite3
 from sqlite3 import Error
 
-from config import db_file
+from config import db_file, filter_max_followers_count, filter_max_friends_count
 
 
 def create_connection(db_file):
@@ -215,5 +215,36 @@ def get_all_records(table_name):
     """
     conn = sqlite3.connect(db_file)
     df = pd.read_sql_query(f"SELECT * FROM {table_name}", conn)
+
+    return df
+
+
+def get_high_value_followers():
+    """ Fetch high value follower information.
+    :return: Data Frame of high value follower details
+    """
+    sql_str = "SELECT * FROM follower"
+    sql_values = False
+
+    if filter_max_followers_count:
+
+        if not sql_values:
+            sql_str = sql_str + f" WHERE followers_count < {filter_max_followers_count}"
+            sql_values = True
+
+        else:
+            sql_str = sql_str + f" AND followers_count < {filter_max_followers_count}"
+
+    if filter_max_friends_count:
+
+        if not sql_values:
+            sql_str = sql_str + f" WHERE friends_count < {filter_max_friends_count}"
+            sql_values = True
+
+        else:
+            sql_str = sql_str + f" AND friends_count < {filter_max_friends_count}"
+
+    conn = sqlite3.connect(db_file)
+    df = pd.read_sql_query(sql_str, conn)
 
     return df

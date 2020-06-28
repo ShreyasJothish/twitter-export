@@ -6,7 +6,7 @@
     "access_token_secret": ""
   },
   "db_file": "./twitter_export.db",
-  "test_flag": true,
+  "test_flag": false,
   "test_accounts": [],
   "test_retry_message": false,
   "enable_dm_flag": false,

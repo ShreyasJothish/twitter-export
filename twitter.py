@@ -240,8 +240,6 @@ def trigger_follower_processing():
     """
     print(f"Triggering follower processing")
 
-    return  # to be deleted
-
     # test account limit
     max_test_account = 5
 
@@ -317,8 +315,8 @@ def trigger_follower_processing():
         print("Fetching follower details from twitter.")
         lookup_users_count = 100
 
-        iterations = total_followers_count // lookup_users_count
-        if total_followers_count % lookup_users_count:
+        iterations = len(follower_id_list) // lookup_users_count
+        if len(follower_id_list) % lookup_users_count:
             iterations = iterations + 1
 
         for i in range(iterations):
@@ -375,6 +373,7 @@ def trigger_follower_processing():
         # sending DM to shortlisted followers
         if enable_dm_flag:
             print("Sending DMs to shortlisted followers.")
-            # send_dm(api, conn, shortlisted_followers)  # to be uncommented
+            send_dm(api, conn, shortlisted_followers)
+
         else:
             print("Sending DMs flag is off.")

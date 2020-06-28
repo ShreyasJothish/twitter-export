@@ -76,21 +76,26 @@ Note: Ensure Access tokens have *Access level: Read, write, and Direct Messages*
     "true" - Sending DMs to followers enabled.
     "false" - Sending DMs to followers disabled.
 "message": DM used during 1st attempt.
-"retry_message": DM used during 2nd attempt.
+"retry_message": DM used during 2nd attempt. There is no check to find if 1st attempt message 
+was successful in conversion. So if you want to disable retrying of DM, set *retry_after_days*
+configuration to higher value.
 "retry_after_days": Number of days after which *retry_message* is attempted after 1st DM.
 
 *follower_filters* - Filters which can be applied to followers on twitter are defined here.
 "follower_filters": {
-"created_before": ISO Format (%Y-%m-%d %H:%M:%S) date time to select followers based on joining date to twitter.
+"created_before": ISO Format (%Y-%m-%d %H:%M:%S) date time to select followers based on 
+joining date to twitter.
 "min_followers_count": Select followers based on minimum follower count of the follower.
 "max_followers_count": Select followers based on maximum follower count of the follower.
 "min_friends_count": Select followers based on minimum friends count of the follower.
 "max_friends_count": Select followers based on maximum friends count of the follower.
 "verified_only": Select followers based on verified by twitter flag.
 }
-Note: Using *min* and *max* configurations, you can send different DMs to high value followers as compared to regular
-followers. Currently you have to manage the DMs manually. Suggested to work backwards ie. have set of DMs for 
-high value followers and once you have reached them move onto the next batch.
+Note: Using *min* and *max* configurations, you can send different DMs to high value followers 
+as compared to regular followers. Currently you have to manage the DMs manually. 
+
+Suggested to work backwards ie. have set of DMs for high value followers and once you have reached 
+them move onto the next batch.
 ```
 
 ### Sample
@@ -120,3 +125,18 @@ high value followers and once you have reached them move onto the next batch.
   }
 }
 ```
+
+## Future enhancements possible
+1. Support multiple users by integrating with existing web application or new deployment.
+2. Support OAuth based authentication.
+3. Make use of better performance database like PostgreSQL or MongoDB.
+4. Support dynamic configuration updates.
+5. Additional filters based on twitter user information.
+6. Special configurations for high value followers.
+7. Support affiliate link solution.
+8. Word Tokenization and other NLP based filter on follower's description.
+9. More visualizations.
+and much more.
+
+Twitter Exporter is developed on Flask framework and many of these is can achieved with minor changes.
+

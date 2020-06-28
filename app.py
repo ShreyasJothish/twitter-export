@@ -1,4 +1,3 @@
-import base64
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
@@ -16,7 +15,8 @@ from db import get_all_records, get_high_value_followers
 tl = Timeloop()
 
 
-@tl.job(interval=timedelta(minutes=60))  # to be updated to days=1
+# Trigger DM logic every 6 hours
+@tl.job(interval=timedelta(hours=6))
 def start_follower_processing():
     trigger_follower_processing()
 
@@ -54,7 +54,7 @@ app.layout = html.Div([
         style={'height': '100vh', 'width': '25%', 'float': 'right', 'display': 'inline-block'}),
     dcc.Interval(
             id='interval-component',
-            interval=60*1000,  # in milliseconds # to be updated to 30 mins
+            interval=30*60*1000,  # 30 minutes in milliseconds
             n_intervals=0
         )
     ], style={'height': '98vh', 'width': '98vw',
@@ -72,9 +72,7 @@ def update_metrics(n):
     dm_status_df = get_all_records("dm_status")
     skip_user_df = get_all_records("skip_user")
 
-    # total_follower_count = get_total_follower_count()  # to be uncommented
-    total_follower_count = 190
-
+    total_follower_count = get_total_follower_count()
 
     fetch_follower_count = follower_df.shape[0]
     dm_count = dm_status_df.shape[0]
@@ -109,35 +107,37 @@ def update_graph_live(n):
 
     fig = go.Figure()
 
-    fig.add_trace(
-        go.Scattergl(
-            x=verified_follower_df['followers_count'],
-            y=verified_follower_df['friends_count'],
-            text=verified_follower_df['name'] + "<br>" + verified_follower_df['dm_count'],
-            mode='markers',
-            marker=dict(
-                size=verified_follower_df['years_on_twitter'] * 2,
-                colorscale='Viridis',
-                line_width=1,
-            ),
-            name='Verified'
+    if not verified_follower_df.empty:
+        fig.add_trace(
+            go.Scattergl(
+                x=verified_follower_df['followers_count'],
+                y=verified_follower_df['friends_count'],
+                text=verified_follower_df['name'] + "<br>" + verified_follower_df['dm_count'],
+                mode='markers',
+                marker=dict(
+                    size=verified_follower_df['years_on_twitter'] * 2,
+                    colorscale='Viridis',
+                    line_width=1,
+                ),
+                name='Verified'
+            )
         )
-    )
 
-    fig.add_trace(
-        go.Scattergl(
-            x=unverified_follower_df['followers_count'],
-            y=unverified_follower_df['friends_count'],
-            text=unverified_follower_df['name'] + "<br>" + unverified_follower_df['dm_count'],
-            mode='markers',
-            marker=dict(
-                size=unverified_follower_df['years_on_twitter'] * 2,
-                colorscale='Viridis',
-                line_width=1,
-            ),
-            name='Unverified'
+    if not unverified_follower_df.empty:
+        fig.add_trace(
+            go.Scattergl(
+                x=unverified_follower_df['followers_count'],
+                y=unverified_follower_df['friends_count'],
+                text=unverified_follower_df['name'] + "<br>" + unverified_follower_df['dm_count'],
+                mode='markers',
+                marker=dict(
+                    size=unverified_follower_df['years_on_twitter'] * 2,
+                    colorscale='Viridis',
+                    line_width=1,
+                ),
+                name='Unverified'
+            )
         )
-    )
 
     fig.update_layout(title='Followers vs. Friends of specific Follower',
                       autosize=True,
